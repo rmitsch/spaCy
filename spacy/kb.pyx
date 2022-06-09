@@ -93,6 +93,9 @@ cdef class KnowledgeBase:
         self.vocab = vocab
         self._create_empty_vectors(dummy_hash=self.vocab.strings[""])
 
+    def entry_index(self) -> PreshMap:
+        return self._entry_index
+
     def initialize_entities(self, int64_t nr_entities):
         self._entry_index = PreshMap(nr_entities + 1)
         self._entries = entry_vec(nr_entities + 1)
