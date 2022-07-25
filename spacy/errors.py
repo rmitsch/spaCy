@@ -939,6 +939,7 @@ class Errors(metaclass=ErrorsWithCodes):
              "`{arg2}`={arg2_values} but these arguments are conflicting.")
     E1043 = ("Expected None or a value in range [{range_start}, {range_end}] for entity linker threshold, but got "
              "{value}.")
+    E1044 = ("CandidateSelector hasn't been initialized properly.")
 
 
 # Deprecated model shortcuts, only used in errors and warnings
