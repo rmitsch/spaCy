@@ -1,6 +1,6 @@
 """Class for candidate selectors."""
 import abc
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Iterator
 
 from spacy.kb import Candidate
 from spacy.kb_new.kb_interface import KnowledgeBase
@@ -14,7 +14,8 @@ class CandidateSelector(abc.ABC):
     def __init__(self, kb: Optional[KnowledgeBase]):
         """Creates a candidate selector.
         kb (Optional[KnowledgeBase]): Instance of KnowledgeBase to associate with this selector. Has to be set before
-            first execution of __call__().
+            first execution of __call__(). Optional so that an instance can be created even if the corresponding
+            KnowledgeBase instance doesn't exist yet.
         """
         self._kb = kb
 
@@ -41,10 +42,10 @@ class CandidateSelector(abc.ABC):
 
     def __call__(
         self, spans: Iterable[Span], **kwargs
-    ) -> Iterable[Iterable[Candidate]]:
-        """Identifies entity candidates in text spans.
+    ) -> Iterable[Iterator[Candidate]]:
+        """Identifies entity candidates in texts.
         dataset_id (str): ID of dataset for which to select candidates.
-        span (Span): Span to match potential entity candidates with.
+        texts (Iterable[Span]): Texts to match entity candidates to.
         RETURNS (Iterable[Iterable[Candidate]]): Candidates for specified entities.
         """
         if not self._is_initialized:
@@ -54,9 +55,9 @@ class CandidateSelector(abc.ABC):
 
     @abc.abstractmethod
     def _select_candidates(
-        self, span: Iterable[Span], **kwargs
-    ) -> Iterable[Iterable[Candidate]]:
+        self, spans: Iterable[Span], **kwargs
+    ) -> Iterable[Iterator[Candidate]]:
         """Fetches candidates for entity in span.text.
-        span (Span): candidate span.
+        spans (Iterable[Span]]): candidate span.
         RETURNS (Iterable[Iterable[Candidate]]): Candidates for specified entities.
         """

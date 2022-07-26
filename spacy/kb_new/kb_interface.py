@@ -1,17 +1,17 @@
-"""Interface for KnowledgeBase for entity or concept linking.
-"""
+"""Interface for KnowledgeBase for entity or concept linking."""
 import abc
 from typing import List, Any, Iterable, Iterator, Collection
 from spacy.kb import Candidate
+from spacy.tokens import Span
 from spacy.util import SimpleFrozenList
 
 
 class KnowledgeBase(abc.ABC):
     """A KnowledgeBase implements everything necessary in order to leverage a specific data structure for (1) adding or
     modifying existing entities and (2) looking up candidate entities for given mentions.
-    A "data structure" can be pretty much anything - custom or third-party software, in-memory or on-disk
-    or only available via network, relational DB or graph DB or text search engine - as long as the necessary interface
-    is fully implemented. It is also possible to implement a data structure directly in a KnowledgeBase class.
+    A "data structure" can be pretty much anything - custom or third-party, in-memory or on-disk or only available via
+    network, relational DB or graph DB or text search engine - as long as the necessary interface is fully implemented.
+    It is also possible to implement a data structure directly in a KnowledgeBase class.
 
     DOCS: https://spacy.io/api/kb.
     """
@@ -134,20 +134,19 @@ class KnowledgeBase(abc.ABC):
         """
         Return candidate entities for an alias. Each candidate defines the entity, the original alias,
         and the prior probability of that alias resolving to that entity.
-        If the alias is not known in the KB, and empty list is returned.
+        If the alias is not known in the KB, an empty list is returned.
         alias (str): Alias for which to get candidates.
         RETURNS (Iterator[Candidate]): Identified candidates for this alias.
         """
 
-    def get_aliases_candidates(
-        self, aliases: Iterable[str]
-    ) -> Iterable[Iterator[Candidate]]:
+    @abc.abstractmethod
+    def get_candidates(self, span: Iterable[Span]) -> Iterable[Iterator[Candidate]]:
         """
-        Return candidate entities for specified aliases. Each candidate defines the entity, the original alias,
+        Return candidate entities for specified texts. Each candidate defines the entity, the original alias,
         and the prior probability of that alias resolving to that entity.
-        If the alias is not known in the KB, and empty list is returned.
-        aliases (Iterable[str]): Aliases for which to get candidates.
-        RETURNS (Iterable[Iterator[Candidate]]): Identified candidates for these aliases.
+        If the no candidate is found for a given text, an empty list is returned.
+        spans (Iterable[Span]): Spans for which to get candidates.
+        RETURNS (Iterable[Iterator[Candidate]]): Identified candidates.
         """
 
     @abc.abstractmethod

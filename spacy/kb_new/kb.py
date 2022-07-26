@@ -1,15 +1,11 @@
-"""Knowledge base for entity or concept linking.
-
-todos for after API finalization:
-todo change entity linker code to batch lookup
-"""
+"""Knowledge base for entity or concept linking."""
 import abc
 from typing import List, Iterable, Iterator, Collection, Optional
 from spacy.kb import Candidate
 from spacy import Vocab
-from spacy.util import SimpleFrozenList
 from .candidate_selector import CandidateSelector
 from . import kb_interface
+from ..tokens import Span
 
 
 class KnowledgeBase(kb_interface.KnowledgeBase, abc.ABC):
@@ -40,10 +36,10 @@ class KnowledgeBase(kb_interface.KnowledgeBase, abc.ABC):
     def entity_vector_length(self) -> int:
         return self._entity_vector_length
 
-    def get_aliases_candidates(
-        self, aliases: Iterable[str]
-    ) -> Iterable[Iterator[Candidate]]:
-        return [self.get_alias_candidates(alias) for alias in aliases]
+    def get_candidates(self, spans: Iterable[Span]) -> Iterable[Iterator[Candidate]]:
+        # This will fail if (1) no candidate selector has been supplied and (2) get_candidates() in the config has not
+        # been explicitly linked with a different function.
+        return self._candidate_selector(spans)
 
     def get_vectors(self, entities: Iterable[str]) -> Iterable[List[float]]:
         return [self.get_vector(entity) for entity in entities]
@@ -56,9 +52,3 @@ class KnowledgeBase(kb_interface.KnowledgeBase, abc.ABC):
             self.get_prior_prob(entity, alias)
             for entity, alias in zip(entities, aliases)
         ]
-
-    def to_disk(self, path: str, exclude: Iterable[str] = SimpleFrozenList()) -> None:
-        raise NotImplementedError
-
-    def from_disk(self, path: str, exclude: Iterable[str] = SimpleFrozenList()) -> None:
-        raise NotImplementedError
